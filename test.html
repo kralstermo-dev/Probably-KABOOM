@@ -1,0 +1,68 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>Probably Boom - Module test page</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <script src="js/theme.js"></script>
+  <link rel="stylesheet" href="css/bomb.css">
+  <style>
+    /* this page scrolls, unlike the bomb page */
+    body { height: auto; display: block; overflow: auto; padding: 16px; }
+    .bar { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; margin-bottom: 8px; }
+    .bar select, .bar button { font: inherit; padding: 6px 10px; }
+    .info { color: var(--muted); margin-bottom: 14px; }
+    .gallery { display: grid; grid-template-columns: repeat(auto-fill, 238px); gap: 14px; }
+    .test-cell .slot { width: 238px; height: 148px; box-sizing: border-box; }
+    .gallery.tall .test-cell .slot { height: 215px; }
+    .slot.broken { border-color: #ff3b30; color: #ff6b6b; }
+    .cap { display: flex; justify-content: space-between; align-items: center; margin-top: 4px; color: var(--muted); font-size: .85rem; }
+    .cap button { padding: 2px 8px; }
+  </style>
+</head>
+<body>
+  <div class="bar">
+    <strong>Module test page</strong>
+    <button class="theme-toggle" data-theme-toggle></button>
+    <label>Difficulty <select id="level"><option value="0">Easy</option><option value="1">Normal</option><option value="2" selected>Hard</option></select></label>
+    <label>Slot <select id="size"><option value="">back (148px tall)</option><option value="tall">front (215px tall)</option></select></label>
+    <label>Zoom <select id="zoom"><option>1</option><option>1.5</option><option>2</option></select></label>
+    <button id="newBomb">New bomb info</button>
+    <button id="checkBtn">Check manual</button>
+    <span id="build"></span>
+    <span>Strikes: <b id="strikes">0</b></span>
+    <span>Fake timer: <b id="fakeTimer">5:00</b></span>
+  </div>
+  <div class="warn" id="warn"></div>
+  <div class="info" id="info"></div>
+  <pre class="info" id="checkOut"></pre>
+  <div class="gallery" id="gallery"></div>
+
+  <script src="js/modules/alchemy.js"></script>
+  <script src="js/modules/binary.js"></script>
+  <script src="js/modules/button.js"></script>
+  <script src="js/modules/clock.js"></script>
+  <script src="js/modules/colors.js"></script>
+  <script src="js/modules/compass.js"></script>
+  <script src="js/modules/fuses.js"></script>
+  <script src="js/modules/hex.js"></script>
+  <script src="js/modules/keypad.js"></script>
+  <script src="js/modules/lights.js"></script>
+  <script src="js/modules/logic.js"></script>
+  <script src="js/modules/math.js"></script>
+  <script src="js/modules/morse.js"></script>
+  <script src="js/modules/multibuttons.js"></script>
+  <script src="js/modules/passwords.js"></script>
+  <script src="js/modules/resistor.js"></script>
+  <script src="js/modules/simon.js"></script>
+  <script src="js/modules/sliders.js"></script>
+  <script src="js/modules/tiles.js"></script>
+  <script src="js/modules/timer.js"></script>
+  <script src="js/modules/wires.js"></script>
+  <script src="js/modules/mazes.js"></script>
+  <script src="js/modules/reactor.js"></script>
+  <script src="js/version.js"></script>
+  <script src="js/test.js"></script>
+</body>
+</html>

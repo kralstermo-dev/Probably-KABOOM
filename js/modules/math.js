@@ -13,7 +13,7 @@ const mathLetters = (n) => letterFor(Math.floor(n / 10)) + letterFor(n % 10);   
 
 // Makes an equation whose answer is always a positive whole number.
 function makeMathProblem() {
-  const op = pick(["+", "-", "x", "/"]);
+  const op = pick(bomb.level >= 2 ? ["+", "-", "x", "/"] : ["+", "-"]);   // x and / only on hard
   let a, b;
   if (op === "/") {                                  // only pairs that divide exactly (answer 2 or more)
     const pairs = [];

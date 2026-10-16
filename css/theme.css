@@ -1,0 +1,89 @@
+/* The colors of the whole game, in one place.
+   Dark mode:  the brown / coral / blue / cream palette.   Light mode:  the sage / sand / cream palette.
+   Change a value here and every page follows. The puzzle colors (wires, buttons, Simon...) are NOT here, on purpose. */
+:root, :root[data-theme="dark"] {
+  color-scheme: dark;
+  --bg: #2b2222;
+  --panel: #413333;
+  --panel-2: #54433f;
+  --side: #362b2b;
+  --border: #6a5757;
+  --slot-border: #7d6a6a;
+  --text: #f5ebdd;
+  --muted: #c4b5a2;
+  --accent: #f2765e;
+  --accent-text: #2b1712;
+  --accent-ink: #f6a090;
+  --heading: #f2765e;
+  --danger: #f2765e;
+  --ok: #a3c26b;
+  --ok-bg: #34402a;
+  --input-bg: #2b2222;
+  --input-border: #7d6a6a;
+  --input-text: #f5ebdd;
+  --port-line: #cdbfae;
+  --edge: rgba(255,255,255,.4);
+  --needle: #f5ebdd;
+  --btn2-bg: #6a5757;
+  --btn2-text: #f5ebdd;
+  --flash: #8c2f22;
+  --key-bg: #d9cfc0;
+  --outer: #2b2222;
+  --paper: #413333;
+  --ink: #f5ebdd;
+  --rule: #7d6a6a;
+  --th-bg: #54433f;
+  --code-bg: #54433f;
+  --nav-bg: #1f1818;
+  --nav-text: #f5ebdd;
+  --page-mark: #bba995;
+  --blue: #315b8c;
+}
+:root[data-theme="light"] {
+  color-scheme: light;
+  --bg: #f7f2eb;
+  --panel: #eae2d6;
+  --panel-2: #dcd2c2;
+  --side: #ddd3c3;
+  --border: #a69d8a;
+  --slot-border: #9a917f;
+  --text: #34382b;
+  --muted: #555849;
+  --accent: #8b9a6e;
+  --accent-text: #1f2615;
+  --accent-ink: #516037;
+  --heading: #c2452b;
+  --danger: #f2765e;
+  --ok: #5f7d3a;
+  --ok-bg: #d9e4c5;
+  --input-bg: #fffdf8;
+  --input-border: #9a917f;
+  --input-text: #34382b;
+  --port-line: #4a4a3c;
+  --edge: rgba(0,0,0,.4);
+  --needle: #34382b;
+  --btn2-bg: #cfc6b4;
+  --btn2-text: #34382b;
+  --flash: #e8a393;
+  --key-bg: #fffdf8;
+  --outer: #eae2d6;
+  --paper: #f7f2eb;
+  --ink: #34382b;
+  --rule: #a69d8a;
+  --th-bg: #eeeeee;
+  --code-bg: #eeeeee;
+  --nav-bg: #8b9a6e;
+  --nav-text: #1f2615;
+  --page-mark: #6a6758;
+  --blue: #315b8c;
+}
+
+/* One font list for the keypad symbols, in the game AND in the manual, so they look the same in both places */
+:root { --symbol-font: "Segoe UI Symbol", "Noto Sans Symbols", "Noto Sans Symbols 2", "Noto Sans Math", "DejaVu Sans", "Arial Unicode MS", sans-serif; }
+
+/* The light / dark button */
+.theme-toggle {
+  position: fixed; top: 10px; right: 10px; z-index: 40; padding: 6px 10px; border-radius: 6px; cursor: pointer;
+  font: 600 0.8rem "Courier New", monospace; border: 1px solid var(--border); background: var(--panel); color: var(--text); opacity: 0.9;
+}
+.nav .theme-toggle, .bar .theme-toggle { position: static; }

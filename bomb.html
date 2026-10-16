@@ -4,10 +4,25 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Probably Boom - Bomb</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <script src="js/theme.js"></script>
   <link rel="stylesheet" href="css/bomb.css">
 </head>
 <body class="pre-start">
-  <div class="ready"><strong>The bomb is sealed.</strong>Get your expert ready with the manual. Nobody sees the bomb until you press Start.</div>
+  <button class="theme-toggle" data-theme-toggle></button>
+  <div class="ready" id="menu">
+    <strong>Probably Boom</strong>
+    <p>Pick a difficulty, then press Start when your expert is ready. The bomb appears and the clock starts right away.</p>
+    <div class="diffs">
+      <button class="diff" data-d="easy"><b>Easy</b><span></span></button>
+      <button class="diff" data-d="normal"><b>Normal</b><span></span></button>
+      <button class="diff" data-d="hard"><b>Hard</b><span></span></button>
+    </div>
+    <p class="warn" id="menuWarn" hidden></p>
+    <button id="startBtn" disabled>Start</button>
+    <div><a class="home-link" href="index.html">Home</a></div>
+    <div class="build" id="build"></div>
+  </div>
 
   <div class="scene" id="scene">
     <div class="cube" id="cube">
@@ -35,11 +50,19 @@
   </div>
 
   <div class="controls">
-    <p class="message" id="message">Press Start when your expert is ready. The bomb appears and the clock starts right away.</p>
-    <button id="startBtn">Start</button>
+    <p class="message" id="message"></p>
     <button id="frontBtn" class="small">Front</button>
     <button id="backBtn" class="small">Back</button>
     <a class="home-link" href="index.html">Home</a>
+  </div>
+
+  <div class="end" id="endScreen" hidden>
+    <div class="end-box">
+      <h1 id="endTitle"></h1>
+      <p id="endReason"></p>
+      <button id="againBtn">Try again</button>
+      <a class="home-link" href="index.html">Home</a>
+    </div>
   </div>
 
   <script src="js/modules/wires.js"></script>
@@ -52,6 +75,20 @@
   <script src="js/modules/keypad.js"></script>
   <script src="js/modules/compass.js"></script>
   <script src="js/modules/colors.js"></script>
+  <script src="js/modules/lights.js"></script>
+  <script src="js/modules/binary.js"></script>
+  <script src="js/modules/clock.js"></script>
+  <script src="js/modules/sliders.js"></script>
+  <script src="js/modules/multibuttons.js"></script>
+  <script src="js/modules/logic.js"></script>
+  <script src="js/modules/alchemy.js"></script>
+  <script src="js/modules/passwords.js"></script>
+  <script src="js/modules/simon.js"></script>
+  <script src="js/modules/tiles.js"></script>
+  <script src="js/modules/fuses.js"></script>
+  <script src="js/modules/mazes.js"></script>
+  <script src="js/modules/reactor.js"></script>
+  <script src="js/version.js"></script>
   <script src="js/bomb.js"></script>
 </body>
 </html>

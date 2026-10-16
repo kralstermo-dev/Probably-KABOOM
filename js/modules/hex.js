@@ -1,9 +1,10 @@
 // Hexadecimal module (manual: Module 6). The display shows letters as hex codes; the player types the letters.
 const HEX_DEBUG = false;   // set to true to print the answer in the browser console while testing
-const HEX_LENGTH = 5;      // how many codes are shown (a good knob for difficulty later)
+const HEX_LENGTHS = [3, 4, 5];   // how many codes are shown on easy, normal and hard
 const hexOf = (letter) => letter.charCodeAt(0).toString(16);   // "a" -> "61"
 
 function mountHex(slotEl, slotIndex) {
+  const HEX_LENGTH = HEX_LENGTHS[bomb.level];
   const letters = Array.from({ length: HEX_LENGTH }, () => pick("abcdefghijklmnopqrstuvwxyz".split("")));
   const word = letters.join("");
   if (HEX_DEBUG) console.log("Hex:", word);

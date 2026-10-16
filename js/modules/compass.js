@@ -14,7 +14,7 @@ function compassAnswer(start, bomb) {
 
 function mountCompass(slotEl, slotIndex) {
   const start = rand(4);                      // where the needle points when the bomb starts
-  let pointing = start;
+  let turns = start;   // quarter turns so far. It only ever goes up, so the needle always turns clockwise, the short way
   const answer = compassAnswer(start, bomb);
   if (COMPASS_DEBUG) console.log("Compass: starts", DIRECTIONS[start], "-> answer", DIRECTIONS[answer]);
 
@@ -31,18 +31,18 @@ function mountCompass(slotEl, slotIndex) {
   slotEl.querySelector(".slot-body").replaceChildren(box);
 
   const needle = box.querySelector(".needle");
-  const aim = () => { needle.style.transform = `rotate(${pointing * 90}deg)`; };
+  const aim = () => { needle.style.transform = `rotate(${turns * 90}deg)`; };
   aim();
 
   const live = () => bomb.running && !bomb.slots[slotIndex].solved;
   box.querySelector(".compass").addEventListener("click", () => {
     if (!live()) return;
-    pointing = (pointing + 1) % 4;
+    turns++;
     aim();
   });
   box.querySelector(".confirm-btn").addEventListener("click", () => {
     if (!live()) return;
-    if (pointing === answer) solveModule(slotIndex);
+    if (turns % 4 === answer) solveModule(slotIndex);
     else addStrike();
   });
 }

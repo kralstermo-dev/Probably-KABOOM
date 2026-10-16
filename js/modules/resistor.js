@@ -4,12 +4,12 @@ const BAND_COLORS = [           // index = the digit the manual gives that color
   ["black", "#111111"], ["brown", "#8b5a2b"], ["red", "#d62828"], ["orange", "#f77f00"], ["yellow", "#fcd34d"],
   ["green", "#2a9d3f"], ["purple", "#7b2cbf"], ["pink", "#f472b6"], ["grey", "#9aa5b1"], ["white", "#ffffff"]
 ];
-const MAX_THIRD_BAND = 6;       // the third band stops at purple (x 1,000,000), as the manual says
+const MAX_THIRD_BANDS = [3, 4, 6];   // highest third band on easy, normal and hard (6 = purple, as the manual says)
 
 const resistorAnswer = (a, b, c) => (a + b) * 10 ** c;   // c is the band's digit, so the multiplier is 10^c
 
 function mountResistor(slotEl, slotIndex) {
-  const a = rand(10), b = rand(10), c = rand(MAX_THIRD_BAND + 1);
+  const a = rand(10), b = rand(10), c = rand(MAX_THIRD_BANDS[bomb.level] + 1);
   const answer = resistorAnswer(a, b, c);
   if (RESISTOR_DEBUG) console.log("Resistor:", BAND_COLORS[a][0], BAND_COLORS[b][0], BAND_COLORS[c][0], "->", answer);
 

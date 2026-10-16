@@ -6,7 +6,7 @@ const MORSE = {
   J: ".---", K: "-.-", L: ".-..", M: "--", N: "-.", O: "---", P: ".--.", Q: "--.-", R: ".-.",
   S: "...", T: "-", U: "..-", V: "...-", W: ".--", X: "-..-", Y: "-.--", Z: "--.."
 };
-const MORSE_HOLD = 1800;         // how long each letter stays on screen (ms)
+const MORSE_HOLDS = [2400, 1800, 1400];   // how long each letter stays on screen (ms) on easy, normal and hard
 const MORSE_REPEAT_HOLD = 1500;  // how long the repeat symbol stays (ms)
 const MORSE_GAP = 300;           // blank pause between frames, so two identical letters are still told apart
 
@@ -35,7 +35,7 @@ function mountMorse(slotEl, slotIndex) {
   function play() {
     if (!live()) { screen.innerHTML = ""; return; }      // game over or module solved: stop
     screen.innerHTML = frame < 4 ? symbols(letters[frame]) : `<span class="repeat">&#8635;</span>`;
-    const hold = frame < 4 ? MORSE_HOLD : MORSE_REPEAT_HOLD;
+    const hold = frame < 4 ? MORSE_HOLDS[bomb.level] : MORSE_REPEAT_HOLD;
     frame = (frame + 1) % 5;
     setTimeout(() => { screen.innerHTML = ""; setTimeout(play, MORSE_GAP); }, hold);
   }

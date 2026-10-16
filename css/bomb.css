@@ -3,8 +3,8 @@ body {
   height: 100vh;
   box-sizing: border-box;
   padding-bottom: 110px;          /* room for the fixed controls */
-  background: #1b1d21;
-  color: #e8e8e8;
+  background: var(--bg);
+  color: var(--text);
   font-family: "Courier New", monospace;
   display: flex;
   justify-content: center;
@@ -20,7 +20,9 @@ body {
   cursor: grab;
   touch-action: none;
   user-select: none;
+  -webkit-user-drag: none;
 }
+.scene input { -webkit-user-select: text; user-select: text; }   /* text boxes must stay typeable, also on iPhones */
 .scene.dragging { cursor: grabbing; }
 
 .cube {
@@ -34,8 +36,8 @@ body {
 .face {
   position: absolute;
   box-sizing: border-box;
-  background: #2c2f36;
-  border: 3px solid #555;
+  background: var(--panel);
+  border: 3px solid var(--border);
   backface-visibility: hidden;
 }
 /* Box is 520 wide, 340 tall, 70 deep. */
@@ -43,7 +45,7 @@ body {
 .back  { width: 520px; height: 340px; padding: 14px; border-radius: 8px; transform: rotateY(180deg) translateZ(35px); }
 
 /* Sides are a few px bigger than needed so they overlap the edges (no gaps). */
-.side { background: #23252b; border-radius: 0; }
+.side { background: var(--side); border-radius: 0; }
 .right   { width: 78px;  height: 340px; left: 221px; transform: rotateY(90deg)  translateZ(260px); }
 .left    { width: 78px;  height: 340px; left: 221px; transform: rotateY(-90deg) translateZ(260px); }
 .topf    { width: 520px; height: 78px;  top: 131px;  transform: rotateX(90deg)  translateZ(170px); }
@@ -55,12 +57,12 @@ body {
   align-items: center;
   justify-content: center;
   text-align: center;
-  color: #ddd;
+  color: var(--text);
 }
 .label.vertical { writing-mode: vertical-rl; }
 
 .face.flash { animation: flash 0.4s; }
-@keyframes flash { 50% { background: #7a1f1f; } }
+@keyframes flash { 50% { background: var(--flash); } }
 
 /* ---------- Face contents ---------- */
 .top {
@@ -72,16 +74,16 @@ body {
   border-radius: 8px;
   margin-bottom: 12px;
 }
-.timer { font-size: 2.6rem; color: #ff3b30; letter-spacing: 4px; }
+.timer { font-size: 2.6rem; color: var(--danger); letter-spacing: 4px; }
 .strikes { font-size: 1.8rem; color: #555; }
-.strikes .on { color: #ff3b30; }
+.strikes .on { color: var(--danger); }
 
 .slots { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
 .front .slots { height: 215px; }
 .back .slots  { height: 100%; grid-template-rows: 1fr 1fr; }
 
 .slot {
-  border: 2px dashed #666;
+  border: 2px dashed var(--slot-border);
   border-radius: 8px;
   padding: 6px;
   display: flex;
@@ -92,8 +94,7 @@ body {
   text-align: center;
   font-size: 0.85rem;
 }
-.slot button { padding: 4px 10px; font-size: 0.75rem; }
-.slot.solved { border: 2px solid #34c759; background: #1d3a27; }
+.slot.solved { border: 2px solid var(--ok); background: var(--ok-bg); }
 
 /* ---------- Controls (pinned to the bottom) ---------- */
 .controls {
@@ -101,7 +102,7 @@ body {
   left: 0; right: 0; bottom: 0;
   padding: 12px;
   text-align: center;
-  background: #1b1d21;
+  background: var(--bg);
   z-index: 10;
 }
 .message { min-height: 1.5em; margin: 0 0 10px; }
@@ -110,10 +111,11 @@ button {
   padding: 8px 16px;
   border-radius: 6px;
   border: 0;
-  background: #ff9f0a;
+  background: var(--accent);
+  color: var(--accent-text);
   cursor: pointer;
 }
-button.small { background: #555; color: #eee; }
+button.small { background: var(--btn2-bg); color: var(--btn2-text); }
 
 /* ---------- Bomb face contents ---------- */
 .face.left {
@@ -122,15 +124,6 @@ button.small { background: #555; color: #eee; }
   justify-content: center;
 }
 
-.face.left .dvi {
-  --ink: #111;
-  --fill: #23252b;      /* matches .side background */
-  font-size: 5px;      /* port is ~21.8em long = ~240px, ~57px thick */
-  display: flex;
-  align-items: center;
-  flex: none;           /* don't let flex squash it into the 72px width */
-  transform: rotate(90deg);
-}
 
 .dvi .hole {
   width: 1.4em; height: 1.4em;
@@ -191,20 +184,13 @@ button.small { background: #555; color: #eee; }
 .battery.d  { width: 30px; height: 62px; }
 
 /* ---------- Ports (left side) ---------- */
-.ports { display: flex; flex-direction: column; align-items: center; gap: 6px; width: 100%; }
-.port-cell.tall { width: 100%; height: 118px; display: flex; align-items: center; justify-content: center; }
-.port-chip {
-  width: 60px; height: 38px; box-sizing: border-box;
-  background: #111; border: 2px solid #000; border-radius: 6px;
-  color: #ddd; font-size: 9px; line-height: 1.1; text-align: center;
-  display: flex; align-items: center; justify-content: center;
-}
+.ports { display: flex; flex-direction: column; align-items: center; gap: 14px; width: 100%; }
 
 /* ---------- Wires module ---------- */
 .wires { display: flex; flex-direction: column; gap: 8px; width: 170px; }
 .wire {
   height: 14px; border-radius: 7px; cursor: pointer;
-  background: var(--c); box-shadow: 0 0 0 1px rgba(255,255,255,.18);
+  background: var(--c); box-shadow: 0 0 0 1px var(--edge);
 }
 .wire:hover { filter: brightness(1.25); }
 .wire.cut {                       /* a cut wire shows two stubs with a gap */
@@ -215,7 +201,7 @@ button.small { background: #555; color: #eee; }
 /* ---------- Button module ---------- */
 .button-module { display: flex; flex-direction: column; align-items: center; gap: 14px; }
 .main-btn {
-  width: 84px; height: 84px; border-radius: 50%;
+  width: 84px; height: 84px; padding: 0; border-radius: 50%;
   background: var(--c); color: #fff; font-weight: bold; font-size: 0.9rem;
   border: 4px solid rgba(0,0,0,.4); box-shadow: 0 4px 0 rgba(0,0,0,.5);
 }
@@ -223,7 +209,7 @@ button.small { background: #555; color: #eee; }
 .confirm-btn { background: #fff; color: #111; padding: 4px 14px; font-size: 0.75rem; }
 
 /* ---------- Home link ---------- */
-.home-link { color: #aaa; margin-left: 14px; font-size: 0.85rem; }
+.home-link { color: var(--muted); margin-left: 14px; font-size: 0.85rem; }
 
 /* ---------- Mathematics module ---------- */
 .math-module { display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -233,21 +219,21 @@ button.small { background: #555; color: #eee; }
 }
 .math-module input {
   width: 90px; font: inherit; text-align: center; padding: 3px; border-radius: 4px;
-  border: 2px solid #666; background: #111; color: #eee;
+  border: 2px solid var(--input-border); background: var(--input-bg); color: var(--input-text);
 }
 
 /* ---------- Pre-start: the bomb stays hidden until Start ---------- */
-.ready { text-align: center; max-width: 420px; line-height: 1.5; color: #bbb; }
-.ready strong { display: block; font-size: 1.6rem; color: #ff3b30; margin-bottom: 8px; }
+.ready { text-align: center; max-width: 420px; line-height: 1.5; color: var(--muted); }
+.ready strong { display: block; font-size: 1.6rem; color: var(--heading); margin-bottom: 8px; }
 body:not(.pre-start) .ready { display: none; }
 body.pre-start .scene, body.pre-start #frontBtn, body.pre-start #backBtn { display: none; }
 
 /* ---------- Timer module (gauge) ---------- */
 .gauge-module { display: flex; flex-direction: column; align-items: center; gap: 6px; }
 .gauge { width: 150px; height: auto; display: block; }
-.gauge .seg { cursor: pointer; stroke: #2c2f36; stroke-width: 3; }
+.gauge .seg { cursor: pointer; stroke: var(--panel); stroke-width: 3; }
 .gauge .seg:hover { filter: brightness(1.25); }
-.gauge .needle { transform-origin: 100px 100px; transition: transform 0.35s ease; fill: #eee; stroke: #000; stroke-width: 1; pointer-events: none; }
+.gauge .needle { transform-origin: 100px 100px; transition: transform 0.35s ease; fill: var(--needle); stroke: var(--panel); stroke-width: 1; pointer-events: none; }
 
 /* ---------- Morse module ---------- */
 .morse-module { display: flex; flex-direction: column; align-items: center; gap: 8px; }
@@ -261,7 +247,7 @@ body.pre-start .scene, body.pre-start #frontBtn, body.pre-start #backBtn { displ
 .morse-screen .repeat { color: #ffd60a; font-size: 1.7rem; }
 .morse-module input {
   width: 90px; font: inherit; text-align: center; text-transform: uppercase; padding: 3px; border-radius: 4px;
-  border: 2px solid #666; background: #111; color: #eee;
+  border: 2px solid var(--input-border); background: var(--input-bg); color: var(--input-text);
 }
 
 /* ---------- Hexadecimal, Resistor, Colors ---------- */
@@ -269,15 +255,15 @@ body.pre-start .scene, body.pre-start #frontBtn, body.pre-start #backBtn { displ
 .hex-screen { padding: 6px 12px; background: #000; color: #7cfc00; border-radius: 4px; font-size: 1.05rem; letter-spacing: 1px; }
 .hex-module input, .resistor-module input, .colors-module input {
   width: 100px; font: inherit; text-align: center; padding: 3px; border-radius: 4px;
-  border: 2px solid #666; background: #111; color: #eee;
+  border: 2px solid var(--input-border); background: var(--input-bg); color: var(--input-text);
 }
 .resistor { width: 160px; height: auto; display: block; }
 .colors-screens { display: flex; gap: 12px; }
-.color-display { width: 54px; height: 40px; border-radius: 6px; border: 3px solid #000; }
+.color-display { width: 54px; height: 40px; border-radius: 6px; border: 3px solid #000; box-shadow: 0 0 0 2px var(--edge); }
 
 /* ---------- Keypad ---------- */
 .keypad-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px; }
-.key { width: 52px; height: 46px; padding: 0; font-size: 1.4rem; background: #ccc; color: #111; }
+.key { width: 52px; height: 46px; padding: 0; font-size: 1.4rem; font-family: var(--symbol-font); background: var(--key-bg); color: #111; border: 2px solid var(--border); }
 .key.lit { background: #34c759; }
 
 /* ---------- Direction (compass) ---------- */
@@ -285,3 +271,226 @@ body.pre-start .scene, body.pre-start #frontBtn, body.pre-start #backBtn { displ
 .compass { width: 88px; height: 88px; padding: 0; border: 0; border-radius: 50%; background: none; }
 .compass svg { width: 100%; height: 100%; display: block; }
 .compass .needle { transform-origin: 50px 50px; transition: transform 0.3s ease; }
+
+/* ---------- Lights module ---------- */
+.lights-module { display: flex; flex-direction: column; align-items: center; gap: 12px; }
+.lights-row { display: flex; gap: 8px; }
+.light {
+  width: 32px; height: 32px; padding: 0; border-radius: 50%;
+  background: #2a2a2a; border: 3px solid var(--c);
+}
+.light.lit { background: var(--c); box-shadow: 0 0 12px var(--c); }
+
+/* ---------- Binary module ---------- */
+.binary-module { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.binary-display {
+  font-size: 1.25rem; letter-spacing: 2px; padding: 4px 14px; border-radius: 4px;
+  background: #000; color: #7cfc00;
+}
+.bits { display: flex; gap: 5px; }
+.bit {
+  width: 30px; height: 40px; padding: 0; font-weight: bold;
+  background: var(--btn2-bg); color: var(--btn2-text); border: 2px solid var(--slot-border); border-radius: 4px;
+}
+.bit.on { background: #ffd60a; color: #111; border-color: #ffd60a; }
+
+/* ---------- Clock Reading ---------- */
+.clock-module { display: flex; align-items: center; gap: 10px; }
+.clock-side { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.clock { width: 84px; height: 84px; display: block; }
+.clock-module input {
+  width: 84px; font: inherit; text-align: center; padding: 3px; border-radius: 4px;
+  border: 2px solid var(--input-border); background: var(--input-bg); color: var(--input-text);
+}
+
+/* ---------- Sliders ---------- */
+.sliders-module { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.sliders-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 8px 14px; }
+.slider-row { display: flex; align-items: center; gap: 4px; }
+.slider-row input { width: 76px; accent-color: var(--c); }
+.slider-row output { width: 12px; font-weight: bold; color: var(--text); }
+
+/* ---------- Multibuttons ---------- */
+.multi-grid { display: grid; grid-template-columns: repeat(3, 60px); gap: 8px; }
+.mbtn { height: 34px; padding: 0; font-weight: bold; background: var(--c); color: #fff; border: 2px solid rgba(0,0,0,.4); }
+.mbtn.yellow { color: #111; }
+.mbtn.done { opacity: 0.3; }
+
+/* ---------- Logic ---------- */
+.logic-module { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.logic-row { display: flex; align-items: center; gap: 6px; }
+.sw { width: 28px; height: 30px; padding: 0; font-weight: bold; background: var(--btn2-bg); color: var(--btn2-text); border: 2px solid var(--slot-border); border-radius: 4px; }
+.sw.on { background: #ffd60a; color: #111; border-color: #ffd60a; box-shadow: 0 0 0 2px var(--text); }
+.gate { width: 26px; text-align: center; font-size: 1.5rem; color: #7cfc00; }
+
+/* ---------- Bad Alchemy ---------- */
+.alchemy-module { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.alchemy-row { display: flex; align-items: center; gap: 5px; margin-bottom: 4px; padding-top: 8px; }
+.mix-target { width: 34px; height: 44px; border-radius: 6px; border: 3px solid #000; background: var(--c); box-shadow: 0 0 0 2px var(--edge); }
+.flask {
+  width: 38px; height: 44px; padding: 0; font-weight: bold; background: #bfe3ea; color: #111;
+  border: 2px solid #000; border-radius: 6px 6px 16px 16px; transition: transform 0.1s;
+}
+.flask.sel { background: #ffd60a; transform: translateY(-6px); box-shadow: 0 6px 0 rgba(0,0,0,.35); outline: 3px solid var(--text); outline-offset: 1px; }   /* a chosen flask turns yellow and lifts up */
+
+/* ---------- Port drawings on the left side of the bomb (the same ones as manual page 42) ---------- */
+.ports {
+  --tile: var(--side); --line: var(--port-line);          /* tile = the side's color, line = the port outlines */
+  .port { position: relative; width: 100%; flex: none; }
+  .shape { position: relative; display: grid; place-items: center; background: var(--line); clip-path: var(--clip); }
+  .shape::before { content: ""; position: absolute; inset: 1px; background: var(--tile); clip-path: var(--clip); }
+  .shape > * { position: relative; }
+  .ring { position: absolute; width: 12px; height: 12px; border: 1px solid var(--line); border-radius: 50%; }
+  .dots { height: 6px; background-image: radial-gradient(circle closest-side, var(--line) 0 70%, transparent 78%); background-repeat: repeat-x; }
+  .d10 { background-size: 10% 100%; }
+  .d9  { width: 90%; margin-inline: auto; background-size: 11.1111% 100%; }
+  .d13 { background-size: 7.6923% 100%; }
+  .d12 { width: 92.3077%; margin-inline: auto; background-size: 8.3333% 100%; }
+  .d8  { background-size: 12.5% 100%; }
+  .tongue { width: 84%; height: 50%; padding: 4px 3px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--line); }
+  .hdmi { --clip: polygon(0 0, 100% 0, 100% 42%, 93% 100%, 7% 100%, 0 42%); width: 150px; height: 52px; }
+  .displayport { --clip: polygon(0 0, 100% 0, 100% 58%, 88% 100%, 0 100%); width: 150px; height: 52px; }
+  .dsub { width: 204px; height: 48px; display: grid; place-items: center; }
+  .dsub .ring { top: 50%; margin-top: -6px; }
+  .dsub .ring.l { left: 6px; }
+  .dsub .ring.r { right: 6px; }
+  .db { --clip: polygon(0 0, 100% 0, 94% 100%, 6% 100%); width: 146px; height: 46px; }
+  .db-face { width: 100%; padding-inline: 14px; display: flex; flex-direction: column; gap: 6px; }
+  .usbc { width: 120px; height: 40px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 20px; }
+  .usbc-tongue { position: relative; width: 82%; height: 20px; border: 1px solid var(--line); }
+  .usbc-tongue::before, .usbc-tongue::after { content: ""; position: absolute; left: 3px; right: 3px; height: 5px;
+    background-image: radial-gradient(circle closest-side, var(--line) 0 70%, transparent 78%); background-size: 8.3333% 100%; background-repeat: repeat-x; }
+  .usbc-tongue::before { top: 2px; }
+  .usbc-tongue::after { bottom: 2px; }
+  .hex { --clip: polygon(50% 0, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%); width: 84px; height: 84px; }
+  .bore { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; }
+  .bore::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--line); }
+  .flange { position: relative; width: 112px; height: 112px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 8px; }
+  .flange .ring.tl { top: 6px; left: 6px; }
+  .flange .ring.br { bottom: 6px; right: 6px; }
+  .xlr { position: relative; width: 82px; height: 82px; border: 1px solid var(--line); border-radius: 50%; }
+  .xlr::before { content: ""; position: absolute; top: 0; left: 50%; width: 12px; height: 9px; margin-left: -6px; border: 1px solid var(--line); border-top: 0; }
+  .sock { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; }
+  .sock::after { content: ""; width: 4px; height: 4px; border-radius: 50%; background: var(--line); }
+  .sock.s1 { left: 50%; top: 70%; }
+  .sock.s2 { left: 31%; top: 38%; }
+  .sock.s3 { left: 69%; top: 38%; }
+  .rj45 { --clip: polygon(0 24%, 30% 24%, 30% 0, 70% 0, 70% 24%, 100% 24%, 100% 100%, 0 100%); width: 100px; height: 84px; }
+  .rj45 .dots { width: 76%; margin-top: 22%; }
+  .dvi { --ink: var(--line); --fill: var(--tile); font-size: 7px; display: flex; align-items: center; flex: none; }
+  /* last, so it wins over the position rules above: every drawing is centered in its slot, scaled, and the sideways ones turned upright */
+  .port > * { position: absolute; left: 50%; top: 50%; translate: -50% -50%; scale: var(--s, 1); }
+  .port > .conn { rotate: 90deg; }
+}
+
+/* ---------- Passwords ---------- */
+.passwords-module { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.password-screen { padding: 6px 14px; background: #000; color: #7cfc00; border-radius: 4px; font-size: 1.3rem; letter-spacing: 5px; }
+.passwords-module input {
+  width: 100px; font: inherit; text-align: center; text-transform: uppercase; padding: 3px; border-radius: 4px;
+  border: 2px solid var(--input-border); background: var(--input-bg); color: var(--input-text);
+}
+
+/* ---------- Simon Says ---------- */
+.simon-module { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.simon-row { display: flex; gap: 8px; }
+.simon-dots { display: flex; gap: 6px; }
+.simon-dots i { width: 10px; height: 10px; border-radius: 50%; background: #444; }
+.simon-dots i.done { background: #34c759; }
+.simon-btn { width: 44px; height: 44px; padding: 0; border-radius: 50%; background: var(--c); border: 3px solid rgba(0,0,0,.45); opacity: 0.45; transition: transform 0.08s; }
+.simon-btn.lit { opacity: 1; transform: scale(1.12); box-shadow: 0 0 18px var(--c); }
+
+/* ---------- Tiles ---------- */
+.tiles-grid { display: grid; grid-template-columns: repeat(6, 26px); gap: 3px; }
+.tile { width: 26px; height: 26px; padding: 0; background: var(--c); border: 2px solid rgba(0,0,0,.45); border-radius: 4px; }
+.tile.step { border-color: #ffd60a; box-shadow: 0 0 6px #ffd60a; }
+
+/* ---------- Fuses ---------- */
+.fuses-module { display: flex; flex-direction: column; align-items: center; gap: 10px; }
+.fuses-row { display: flex; gap: 8px; }
+.fuse { width: 30px; height: 46px; padding: 0; background: var(--c); border: 2px solid #000; border-radius: 3px 3px 10px 10px; }
+.fuse.out { opacity: 0.15; }
+
+/* ---------- Menu: difficulty and a centered Start ---------- */
+body.pre-start .controls { display: none; }
+.ready .diffs { display: flex; flex-wrap: wrap; justify-content: center; gap: 12px; margin: 18px 0 22px; }
+.diff {
+  width: 112px; padding: 12px 8px; display: flex; flex-direction: column; align-items: center; gap: 6px;
+  background: var(--panel); color: var(--text); border: 3px solid var(--border); border-radius: 10px; font: inherit;
+}
+.diff b { font-size: 1.15rem; color: var(--accent-ink); }
+.diff span { font-size: 0.8rem; color: var(--muted); line-height: 1.3; }
+.diff.picked { border-color: var(--accent); background: var(--panel-2); }
+#startBtn { font-size: 1.3rem; padding: 12px 48px; }
+#startBtn:disabled { opacity: 0.35; cursor: not-allowed; }
+
+/* ---------- Boom (and defused) screen ---------- */
+.end { position: fixed; inset: 0; z-index: 50; display: flex; align-items: center; justify-content: center; text-align: center; }
+.end[hidden] { display: none; }
+.end-box { position: relative; }
+.end.boom { background: #150000; animation: shake 0.5s; }
+.end.boom::before {                          /* the explosion: a bright flash at first, then it fades away after about 2.5 seconds */
+  content: ""; position: absolute; inset: 0;
+  background: radial-gradient(circle, #ffb703 0%, #d62828 35%, #230000 80%);
+  animation: boomflash 1s ease-out, boomfade 1.2s ease 2.6s forwards;
+}
+.end.win { background: radial-gradient(circle, #1d3a27 0%, #0d1f14 80%); }
+.end-box h1 { margin: 0; font-size: clamp(3rem, 15vw, 7.5rem); letter-spacing: 4px; color: #fff; text-shadow: 0 0 30px rgba(0,0,0,.6); animation: boompop 0.6s cubic-bezier(.2, 1.6, .4, 1); }
+.end.boom .end-box h1 { animation: boompop 0.6s cubic-bezier(.2, 1.6, .4, 1), boomout 0.8s ease 2.6s forwards; }
+.end.win .end-box h1 { color: #34c759; font-size: clamp(2rem, 9vw, 4.5rem); }
+.end-box p { margin: 12px 0 26px; color: #eee; }
+@keyframes boomflash { from { filter: brightness(4); } to { filter: brightness(1); } }
+@keyframes boomfade { to { opacity: 0; } }
+@keyframes boomout { to { opacity: 0; transform: scale(1.5); } }
+@keyframes boompop { from { transform: scale(0.2) rotate(-8deg); opacity: 0; } to { transform: scale(1) rotate(0); opacity: 1; } }
+@keyframes shake { 0%, 100% { transform: translate(0); } 20% { transform: translate(-14px, 8px); } 40% { transform: translate(12px, -10px); } 60% { transform: translate(-10px, -6px); } 80% { transform: translate(8px, 10px); } }
+@media (prefers-reduced-motion: reduce) { .end.boom, .end.boom::before, .end-box h1 { animation: none; } }
+
+/* ---------- Mazes ---------- */
+.mazes-module { display: flex; align-items: center; gap: 10px; }
+.maze-svg { width: 130px; height: 130px; display: block; flex: none; }
+.maze-pad { display: grid; grid-template-columns: repeat(3, 22px); grid-template-rows: repeat(3, 22px); gap: 4px; }
+.maze-pad button { padding: 0; font-size: 1.1rem; font-weight: bold; }
+.maze-pad [data-d="U"] { grid-area: 1 / 2; }
+.maze-pad [data-d="L"] { grid-area: 2 / 1; }
+.maze-pad [data-d="R"] { grid-area: 2 / 3; }
+.maze-pad [data-d="D"] { grid-area: 3 / 2; }
+
+/* ---------- Reactor Startup ---------- */
+.reactor-module { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.reactor-head { display: flex; align-items: center; gap: 8px; font-size: 0.8rem; color: var(--accent-ink); }
+.reactor-lamps { display: flex; gap: 4px; }
+.reactor-lamps i { width: 10px; height: 10px; border-radius: 50%; background: #444; }
+.reactor-lamps i.done { background: #34c759; }
+.reactor-lamps i.now { background: #ffd60a; }
+.reactor-stage { display: flex; flex-direction: column; align-items: center; gap: 8px; }
+.reactor-slider { display: flex; align-items: center; gap: 6px; }
+.reactor-slider input { width: 130px; accent-color: #ffd60a; }
+.reactor-slider output { width: 12px; font-weight: bold; color: var(--accent-ink); }
+.reactor-stage > input[type="text"], .reactor-stage > input:not([type]) {
+  width: 90px; font: inherit; text-align: center; padding: 3px; border-radius: 4px; border: 2px solid var(--input-border); background: var(--input-bg); color: var(--input-text);
+}
+.rods { display: flex; gap: 6px; }
+.ignite { width: 96px; height: 44px; padding: 0; font-weight: bold; letter-spacing: 1px; color: #fff; background: #d62828; border: 3px solid rgba(0,0,0,.45); border-radius: 8px; }
+
+/* ---------- Drawings that follow the theme (their colors are written inside the module scripts) ---------- */
+.compass svg circle { fill: var(--bg); stroke: var(--port-line); }
+.compass svg text { fill: var(--text); }
+.compass .needle polygon:last-child { fill: var(--needle); }
+.maze-svg g { fill: var(--muted); }
+
+/* ---------- Logic: the wiring diagram ---------- */
+.logic-diagram { position: relative; width: 200px; height: 92px; }
+.logic-diagram svg { position: absolute; inset: 0; width: 100%; height: 100%; }
+.logic-diagram path { stroke: var(--text); stroke-width: 2; fill: none; opacity: 0.75; }
+.logic-diagram .sw { position: absolute; left: 0; width: 28px; height: 26px; padding: 0; }
+.ld-a { top: 0; } .ld-b { top: 33px; } .ld-c { top: 66px; }
+.logic-diagram .gate {                       /* the gate symbols sit in black boxes, like the other screens, so they are readable in both modes */
+  position: absolute; width: 28px; height: 28px; display: flex; align-items: center; justify-content: center;
+  background: #000; color: #7cfc00; border-radius: 6px; font-size: 1.25rem;
+}
+.ld-g1 { left: 78px; top: 16px; } .ld-g2 { left: 140px; top: 34px; }
+
+/* ---------- Warnings and the build number ---------- */
+.warn { color: var(--heading); font-size: 0.85rem; margin: 0 0 12px; }
+.build { margin-top: 10px; font-size: 0.7rem; color: var(--muted); }

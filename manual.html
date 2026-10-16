@@ -4,21 +4,23 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
   <title>Probably Boom - Manual</title>
+  <link rel="stylesheet" href="css/theme.css">
+  <script src="js/theme.js"></script>
   <style>
-    body { margin: 0; background: #e9e6df; color: #222; font-family: Georgia, "Times New Roman", serif; }
+    body { margin: 0; background: var(--outer); color: var(--ink); font-family: Georgia, "Times New Roman", serif; }
     .nav { position: sticky; top: 0; display: flex; gap: 12px; align-items: center; padding: 8px 16px;
-           background: #222; font-family: "Courier New", monospace; }
-    .nav a, .nav button { color: #eee; background: none; border: 1px solid #666; border-radius: 4px;
+           background: var(--nav-bg); font-family: "Courier New", monospace; }
+    .nav a, .nav button { color: var(--nav-text); background: none; border: 1px solid var(--nav-text); border-radius: 4px;
                           padding: 4px 12px; font: inherit; text-decoration: none; cursor: pointer; }
-    #manual { max-width: 780px; margin: 20px auto; padding: 32px 40px; background: #fffdf8;
+    #manual { max-width: 780px; margin: 20px auto; padding: 32px 40px; background: var(--paper);
               box-shadow: 0 2px 10px rgba(0,0,0,.25); line-height: 1.55; }
-    h1 { border-bottom: 3px solid #222; padding-bottom: 6px; }
+    h1 { border-bottom: 3px solid var(--ink); padding-bottom: 6px; }
     table { border-collapse: collapse; margin: 12px 0; }
-    th, td { border: 1px solid #555; padding: 4px 12px; text-align: center; }
-    th { background: #eee; }
-    code { background: #eee; padding: 0 4px; border-radius: 3px; }
-    blockquote.page-marker { margin: 28px 0 8px; padding: 6px 0 0; border: 0; border-top: 1px dashed #999;
-                             text-align: center; color: #777; }
+    th, td { border: 1px solid var(--rule); padding: 4px 12px; text-align: center; }
+    th { background: var(--th-bg); }
+    code { background: var(--code-bg); padding: 0 4px; border-radius: 3px; }
+    blockquote.page-marker { margin: 28px 0 8px; padding: 6px 0 0; border: 0; border-top: 1px dashed var(--rule);
+                             text-align: center; color: var(--page-mark); }
     blockquote.page-marker h6 { margin: 0; font-size: .8rem; letter-spacing: 2px; }
     * { -webkit-print-color-adjust: exact; print-color-adjust: exact; }   /* keep the colors when printing */
     .band { display: inline-block; min-width: 96px; padding: 2px 10px; border-radius: 4px; border: 1px solid rgba(0,0,0,.35); text-align: center; }
@@ -33,7 +35,7 @@
     .band.pink   { background: #f472b6; color: #111; }
     .band.grey   { background: #9aa5b1; color: #111; }
     .band.white  { background: #fff;    color: #111; }
-    .keypad td { font-size: 1.6rem; padding: 4px 18px; }
+    .keypad td { font-size: 1.6rem; padding: 4px 18px; font-family: var(--symbol-font); }
     .calc { position: fixed; right: 16px; bottom: 16px; width: 230px; padding: 10px; z-index: 20; background: #222;
             border: 1px solid #666; border-radius: 8px; font-family: "Courier New", monospace; box-shadow: 0 4px 14px rgba(0,0,0,.4); }
     .calc[hidden] { display: none; }
@@ -43,8 +45,82 @@
     .calc-keys button { padding: 8px 0; font: inherit; background: #444; color: #eee; border: 0; border-radius: 4px; cursor: pointer; }
     .calc-keys button.op { background: #ff9f0a; color: #111; }
     @media print { .calc { display: none; } }
-    @media (max-width: 600px) { #manual { margin: 0; padding: 20px 16px; } }
+    /* ---- Port identification page (page 42): your Port Panel drawings, plus DVI and Ethernet ---- */
+    .band.tan { background: #d2b48c; color: #111; }
+    .ports-sheet {
+      --tile: var(--side); --line: var(--port-line); --fg: var(--text);
+      display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin: 14px 0;
+      figure { margin: 0; min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 8px;
+               padding: 12px 8px 10px; border-radius: 4px; background: var(--tile); }
+      .stage { position: relative; height: 170px; width: 100%; display: grid; place-items: center; overflow: hidden; }
+      figcaption { color: var(--fg); font: 600 1rem/1 "Arial Narrow", Arial, sans-serif; letter-spacing: .1em; text-transform: uppercase; }
+      .shape { position: relative; display: grid; place-items: center; background: var(--line); clip-path: var(--clip); }
+      .shape::before { content: ""; position: absolute; inset: 1px; background: var(--tile); clip-path: var(--clip); }
+      .shape > * { position: relative; }
+      .conn { position: absolute; left: 50%; top: 50%; translate: -50% -50%; rotate: 90deg; scale: .8; }   /* lying down, turned upright */
+      .ring { position: absolute; width: 12px; height: 12px; border: 1px solid var(--line); border-radius: 50%; }
+      .dots { height: 6px; background-image: radial-gradient(circle closest-side, var(--line) 0 70%, transparent 78%); background-repeat: repeat-x; }
+      .d10 { background-size: 10% 100%; }
+      .d9  { width: 90%; margin-inline: auto; background-size: 11.1111% 100%; }
+      .d13 { background-size: 7.6923% 100%; }
+      .d12 { width: 92.3077%; margin-inline: auto; background-size: 8.3333% 100%; }
+      .d8  { background-size: 12.5% 100%; }
+      .tongue { width: 84%; height: 50%; padding: 4px 3px; display: flex; flex-direction: column; justify-content: space-between; border: 1px solid var(--line); }
+      .hdmi { --clip: polygon(0 0, 100% 0, 100% 42%, 93% 100%, 7% 100%, 0 42%); width: 150px; height: 52px; }
+      .displayport { --clip: polygon(0 0, 100% 0, 100% 58%, 88% 100%, 0 100%); width: 150px; height: 52px; }
+      .dsub { width: 204px; height: 48px; display: grid; place-items: center; }
+      .dsub .ring { top: 50%; margin-top: -6px; }
+      .dsub .ring.l { left: 6px; }
+      .dsub .ring.r { right: 6px; }
+      .db { --clip: polygon(0 0, 100% 0, 94% 100%, 6% 100%); width: 146px; height: 46px; }
+      .db-face { width: 100%; padding-inline: 14px; display: flex; flex-direction: column; gap: 6px; }
+      .usbc { width: 120px; height: 40px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 20px; }
+      .usbc-tongue { position: relative; width: 82%; height: 20px; border: 1px solid var(--line); }
+      .usbc-tongue::before, .usbc-tongue::after { content: ""; position: absolute; left: 3px; right: 3px; height: 5px;
+        background-image: radial-gradient(circle closest-side, var(--line) 0 70%, transparent 78%); background-size: 8.3333% 100%; background-repeat: repeat-x; }
+      .usbc-tongue::before { top: 2px; }
+      .usbc-tongue::after { bottom: 2px; }
+      .hex { --clip: polygon(50% 0, 93% 25%, 93% 75%, 50% 100%, 7% 75%, 7% 25%); width: 84px; height: 84px; }
+      .bore { width: 44px; height: 44px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; }
+      .bore::after { content: ""; width: 6px; height: 6px; border-radius: 50%; background: var(--line); }
+      .flange { position: relative; width: 112px; height: 112px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 8px; }
+      .flange .ring.tl { top: 6px; left: 6px; }
+      .flange .ring.br { bottom: 6px; right: 6px; }
+      .xlr { position: relative; width: 82px; height: 82px; border: 1px solid var(--line); border-radius: 50%; }
+      .xlr::before { content: ""; position: absolute; top: 0; left: 50%; width: 12px; height: 9px; margin-left: -6px; border: 1px solid var(--line); border-top: 0; }
+      .sock { position: absolute; width: 14px; height: 14px; margin: -7px 0 0 -7px; display: grid; place-items: center; border: 1px solid var(--line); border-radius: 50%; }
+      .sock::after { content: ""; width: 4px; height: 4px; border-radius: 50%; background: var(--line); }
+      .sock.s1 { left: 50%; top: 70%; }
+      .sock.s2 { left: 31%; top: 38%; }
+      .sock.s3 { left: 69%; top: 38%; }
+      .rj45 { --clip: polygon(0 24%, 30% 24%, 30% 0, 70% 0, 70% 24%, 100% 24%, 100% 100%, 0 100%); width: 100px; height: 84px; }
+      .rj45 .dots { width: 76%; margin-top: 22%; }
+      .dvi { --ink: var(--line); --fill: var(--tile); font-size: 7px; display: flex; align-items: center; flex: none; }
+      .dvi .hole { width: 1.4em; height: 1.4em; border: .2em solid var(--ink); border-radius: 50%; box-sizing: border-box; }
+      .dvi .shell { --shape: polygon(0 0, 100% 0, 97% 100%, 3% 100%); position: relative; width: 19em; height: 5.2em; background: var(--ink);
+        clip-path: var(--shape); display: flex; align-items: center; justify-content: space-evenly; }
+      .dvi .shell::before { content: ""; position: absolute; inset: .2em; background: var(--fill); clip-path: var(--shape); }
+      .dvi .shell > * { position: relative; }
+      .dvi .pins { width: 8em; height: 3em; background: radial-gradient(circle, var(--ink) .2em, transparent .25em) 0 0 / 1em 1em; }
+      .dvi .divider { width: .2em; height: 3.6em; background: var(--ink); }
+      .dvi .blade { width: 2em; height: .2em; background: var(--ink); }
+    }
+    .mazes-sheet { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 14px; margin: 14px 0; }
+    .mazes-sheet figure { margin: 0; text-align: center; }
+    .mazes-sheet svg { width: 100%; max-width: 175px; height: auto; }
+    .mazes-sheet figcaption { font-size: .85rem; color: var(--page-mark); }
+    .table-wrap { max-width: 100%; overflow-x: auto; }   /* safety net: a table that is still too wide scrolls inside its box */
+    #manual { overflow-wrap: anywhere; }
+    @media (max-width: 600px) {
+      #manual { margin: 0; padding: 20px 14px; }
+      th, td { padding: 3px 5px; font-size: 0.85rem; }
+      .band { min-width: 0; padding: 2px 5px; font-size: 0.8rem; }
+      .keypad td { font-size: 1.4rem; padding: 4px 8px; }
+    }
+    @media print { .table-wrap { overflow: visible; } }
     @media print {
+      /* printing always uses black on white, whatever the screen theme is */
+      :root, :root[data-theme="dark"], :root[data-theme="light"] { --outer: #fff; --paper: #fff; --ink: #000; --rule: #555; --th-bg: #eee; --code-bg: #eee; --page-mark: #777; }
       body { background: #fff; }
       .nav { display: none; }
       #manual { margin: 0; padding: 0; box-shadow: none; max-width: none; }
@@ -53,7 +129,7 @@
   </style>
 </head>
 <body>
-  <nav class="nav"><a href="index.html">Home</a><button id="calcToggle">Calculator</button><button onclick="window.print()">Print</button></nav>
+  <nav class="nav"><a href="index.html">Home</a><button id="calcToggle">Calculator</button><button onclick="window.print()">Print</button><button class="theme-toggle" data-theme-toggle></button></nav>
   <main id="manual">Loading manual...</main>
 
   <div id="calc" class="calc" hidden>
@@ -66,7 +142,8 @@
   <script>
     // Loads manual.md and turns it into a page. Edit manual.md, push, and the site updates.
     // It tries a few likely file names in the same folder as this page.
-    const PATHS = ["manual.md", "Manual.md", "Bomb.md", "manual/manual.md"];
+    const wanted = new URLSearchParams(location.search).get("file");   // manual.html?file=my-draft.md previews another file
+    const PATHS = /^[\w.\-]+\.md$/.test(wanted || "") ? [wanted] : ["manual.md", "Manual.md", "Bomb.md", "manual/manual.md"];
     async function loadManual() {
       for (const p of PATHS) {
         try { const r = await fetch(p); if (r.ok) return await r.text(); } catch (e) { /* try the next name */ }
@@ -77,6 +154,13 @@
       .then((md) => {
         const el = document.getElementById("manual");
         el.innerHTML = marked.parse(md);
+        // Put every table in a box that can scroll sideways on small screens
+        el.querySelectorAll("table").forEach((t) => {
+          const wrap = document.createElement("div");
+          wrap.className = "table-wrap";
+          t.parentNode.insertBefore(wrap, t);
+          wrap.appendChild(t);
+        });
         // Style the "PAGE n / 43" lines as page footers (and page breaks when printing)
         el.querySelectorAll("blockquote").forEach((b) => {
           if (/^\s*PAGE \d+/i.test(b.textContent)) b.classList.add("page-marker");

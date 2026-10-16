@@ -55,7 +55,7 @@ function wiresAnswer(wires, bomb) {
 // Draws the module inside a slot and handles clicks.
 function mountWires(slotEl, slotIndex) {
   const colorNames = Object.keys(WIRE_COLORS);
-  const wires = Array.from({ length: 3 + rand(4) }, () => pick(colorNames)); // 3 to 6 wires
+  const wires = Array.from({ length: 3 + rand(2 + bomb.level) }, () => pick(colorNames)); // easy 3-4 wires, normal 3-5, hard 3-6
   const required = new Set(wiresAnswer(wires, bomb));
   if (WIRE_DEBUG) console.log("Wires:", wires.join(", "), "-> cut (0-based):", [...required]);
 

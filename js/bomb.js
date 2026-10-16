@@ -1,11 +1,25 @@
 // ---------- Settings ----------
-const START_SECONDS = 300;      // 5 minutes
 const MAX_STRIKES = 3;
-const SLOT_COUNT = 6;           // first 2 go on the front, the rest on the back
 const MAX_SAME_MODULE = 2;     // at most this many of the same module type on one bomb
 const SPEED_PER_STRIKE = 0.25;  // each strike makes the timer 25% faster
 const ALL_PORTS = ["DVI", "HDMI", "USB-C", "Parallel", "Audio Jack", "Display Port", "Ethernet", "XLR"];
 const BATTERY_TYPES = ["AA", "D"];
+
+// ---------- Difficulty ----------
+// The level (0, 1 or 2) is also stored as bomb.level, so single modules can get harder too.
+const DIFFICULTIES = {
+  easy:   { name: "Easy",   level: 0, modules: 2, seconds: 180 },   // 3:00
+  normal: { name: "Normal", level: 1, modules: 4, seconds: 270 },   // 4:30
+  hard:   { name: "Hard",   level: 2, modules: 6, seconds: 360 }    // 6:00
+};
+const MIN_OWN_TIER = [0, 1, 2];   // a bomb always has at least this many modules from its own difficulty
+// Every module belongs to the easiest difficulty it can appear on (0 easy, 1 normal, 2 hard).
+// A bomb can use modules of its own tier and of any easier tier, never harder ones.
+const MODULE_TIERS = {
+  mountWires: 0, mountButton: 0, mountTimerModule: 0, mountColors: 0, mountCompass: 0, mountClock: 0, mountFuses: 0,
+  mountMorse: 1, mountMath: 1, mountHex: 1, mountResistor: 1, mountKeypad: 1, mountBinary: 1, mountAlchemy: 1, mountMultibuttons: 1,
+  mountLights: 2, mountSliders: 2, mountLogic: 2, mountPasswords: 2, mountSimon: 2, mountTiles: 2, mountMazes: 2, mountReactor: 2
+};
 
 // ---------- Helpers ----------
 const rand = (n) => Math.floor(Math.random() * n);
@@ -35,16 +49,21 @@ function makeBatteries() {                   // 0 to 4 batteries, each AA or D
 }
 
 // ---------- Bomb state ----------
+// The bomb is made when the player presses Start, so it fits the chosen difficulty.
 // Manual rules read from here, e.g. bomb.batteries.includes("AA") or bomb.batteries.length >= 2
-const bomb = {
-  serial: makeSerial(),
-  batteries: makeBatteries(),   // e.g. ["AA", "D", "AA"]
-  ports: makePorts(),           // e.g. ["DVI", "XLR"]
-  timeLeft: START_SECONDS,
-  strikes: 0,
-  running: false,
-  slots: []
-};
+let bomb = null;
+function newBomb(d) {
+  return {
+    serial: makeSerial(),
+    batteries: makeBatteries(),   // e.g. ["AA", "D", "AA"]
+    ports: makePorts(),           // e.g. ["DVI", "XLR"]
+    timeLeft: d.seconds,
+    strikes: 0,
+    running: false,
+    slots: [],
+    level: d.level                // 0 easy, 1 normal, 2 hard
+  };
+}
 let tickHandle = null;
 
 // ---------- Display ----------
@@ -54,17 +73,33 @@ function formatTime(sec) {
   return `${m}:${s}`;
 }
 
-// Your DVI drawing, as HTML. Other ports are plain labeled chips until you draw them.
-const DVI_HTML = `<div class="dvi"><span class="hole"></span><div class="shell"><div class="pins"></div><div class="divider"></div><div class="blade"></div></div><span class="hole"></span></div>`;
+// Drawings of every port (the same ones shown on manual page 42). w and h are the upright size in pixels.
+const PORT_ART = {
+  "DVI":          { w: 36,  h: 153, html: `<div class="conn dvi"><span class="hole"></span><div class="shell"><div class="pins"></div><div class="divider"></div><div class="blade"></div></div><span class="hole"></span></div>` },
+  "HDMI":         { w: 52,  h: 150, html: `<div class="conn shape hdmi"><div class="tongue"><div class="dots d10"></div><div class="dots d9"></div></div></div>` },
+  "USB-C":        { w: 40,  h: 120, html: `<div class="conn usbc"><div class="usbc-tongue"></div></div>` },
+  "Parallel":     { w: 48,  h: 204, html: `<div class="conn dsub"><i class="ring l"></i><div class="shape db"><div class="db-face"><div class="dots d13"></div><div class="dots d12"></div></div></div><i class="ring r"></i></div>` },
+  "Audio Jack":   { w: 84,  h: 84,  html: `<div class="shape hex"><div class="bore"></div></div>` },
+  "Display Port": { w: 52,  h: 150, html: `<div class="conn shape displayport"><div class="tongue"><div class="dots d10"></div><div class="dots d10"></div></div></div>` },
+  "Ethernet":     { w: 100, h: 84,  html: `<div class="shape rj45"><div class="dots d8"></div></div>` },
+  "XLR":          { w: 112, h: 112, html: `<div class="flange"><i class="ring tl"></i><i class="ring br"></i><div class="xlr"><i class="sock s1"></i><i class="sock s2"></i><i class="sock s3"></i></div></div>` }
+};
+
+const PORT_SCALE = 0.42;   // every port is drawn at this size, however many ports the bomb has (raise it for bigger ports)
+
+function portsHTML(list) {
+  return list.map((name) => {
+    const p = PORT_ART[name];
+    return `<div class="port" style="--s:${PORT_SCALE};height:${Math.round(p.h * PORT_SCALE)}px">${p.html}</div>`;
+  }).join("");
+}
 
 function renderInfo() {
   $("serial").textContent = bomb.serial;
   $("batteries").innerHTML = bomb.batteries
     .map((t) => `<div class="battery ${t.toLowerCase()}"><span>${t}</span></div>`)
     .join("");
-  $("ports").innerHTML = bomb.ports
-    .map((p) => (p === "DVI" ? `<div class="port-cell tall">${DVI_HTML}</div>` : `<div class="port-chip">${p}</div>`))
-    .join("");
+  $("ports").innerHTML = portsHTML(bomb.ports);
 }
 function renderTimer() { $("timer").textContent = formatTime(bomb.timeLeft); }
 function renderStrikes() {
@@ -90,9 +125,14 @@ function fitToScreen() {
 }
 
 let dragging = false, lastX = 0, lastY = 0;
+
+// Stop the browser from dragging selected text or "image ghosts" instead of turning the bomb.
+scene.addEventListener("dragstart", (e) => e.preventDefault());
+scene.addEventListener("mousedown", (e) => { if (!e.target.closest("button, input, .wire, .seg")) e.preventDefault(); });
 scene.addEventListener("pointerdown", (e) => {
   if (e.target.closest("button, .wire, input, .seg")) return;   // clicks on controls should not spin the bomb
   dragging = true;
+  if (window.getSelection) window.getSelection().removeAllRanges();   // drop any selected page text
   lastX = e.clientX;
   lastY = e.clientY;
   cube.classList.remove("snap");
@@ -120,34 +160,35 @@ function snapTo(x, y) {
 }
 
 // ---------- Slots ----------
+// Picks which modules go on this bomb: its own tier and easier ones, at most MAX_SAME_MODULE of any type,
+// and always at least MIN_OWN_TIER modules from the bomb's own difficulty.
+function chooseModules(level, count) {
+  const pool = Object.keys(MODULE_TIERS).filter((n) => window[n] && MODULE_TIERS[n] <= level);
+  const own = pool.filter((n) => MODULE_TIERS[n] === level);
+  const picked = [], used = new Map();
+  const add = (list) => {
+    const options = list.filter((n) => (used.get(n) || 0) < MAX_SAME_MODULE);
+    if (!options.length) return false;
+    const name = pick(options);
+    used.set(name, (used.get(name) || 0) + 1);
+    picked.push(name);
+    return true;
+  };
+  for (let i = 0; i < MIN_OWN_TIER[level]; i++) add(own);
+  while (picked.length < count && add(pool)) { /* keep adding */ }
+  return picked.sort(() => Math.random() - 0.5);       // so the harder ones are not always in the same slots
+}
+
 // Each slot has an LED (top right) that turns green when the module is solved.
-function buildSlots() {
-  const used = new Map();           // how many of each module type this bomb already has
-  for (let i = 0; i < SLOT_COUNT; i++) {
+function buildSlots(d) {
+  chooseModules(d.level, d.modules).forEach((name, i) => {
     bomb.slots.push({ solved: false });
     const div = document.createElement("div");
     div.className = "slot";
     div.id = `slot-${i}`;
-    div.innerHTML = `
-      <span class="led"></span>
-      <div class="slot-body">
-        <span>Empty module ${i + 1}</span>
-        <button data-solve="${i}">Test: solve</button>
-        <button data-strike="${i}">Test: strike</button>
-      </div>`;
+    div.innerHTML = `<span class="led"></span><div class="slot-body"></div>`;
     $(i < 2 ? "slots-front" : "slots-back").appendChild(div);
-    const mounters = [window.mountWires, window.mountButton, window.mountTimerModule, window.mountMath, window.mountMorse, window.mountHex, window.mountResistor, window.mountKeypad, window.mountCompass, window.mountColors].filter(Boolean);   // add new modules to this list
-    const options = mounters.filter((m) => (used.get(m) || 0) < MAX_SAME_MODULE);   // drop types that hit the cap
-    if (options.length) {
-      const chosen = pick(options);                 // random module for this slot
-      used.set(chosen, (used.get(chosen) || 0) + 1);
-      chosen(div, i);
-    }
-  }
-  cube.addEventListener("click", (e) => {
-    if (!bomb.running) return;
-    if (e.target.dataset.solve !== undefined) solveModule(Number(e.target.dataset.solve));
-    if (e.target.dataset.strike !== undefined) addStrike();
+    window[name](div, i);
   });
 }
 
@@ -157,7 +198,7 @@ function solveModule(i) {
   bomb.slots[i].solved = true;
   const el = $(`slot-${i}`);
   el.classList.add("solved");                       // this also lights the LED
-  if (!el.querySelector(".wires, .button-module, .gauge-module, .math-module, .morse-module, .hex-module, .resistor-module, .keypad-module, .compass-module, .colors-module")) el.querySelector(".slot-body").innerHTML = "<span>Module solved</span>";
+  if (!el.querySelector(".wires, .button-module, .gauge-module, .math-module, .morse-module, .hex-module, .resistor-module, .keypad-module, .compass-module, .colors-module, .lights-module, .binary-module, .clock-module, .sliders-module, .multi-grid, .logic-module, .alchemy-module, .passwords-module, .simon-module, .tiles-grid, .fuses-module, .mazes-module, .reactor-module")) el.querySelector(".slot-body").innerHTML = "<span>Module solved</span>";
   if (bomb.slots.every((s) => s.solved)) win();
 }
 
@@ -169,7 +210,7 @@ function addStrike() {
     void f.offsetWidth;
     f.classList.add("flash");
   });
-  if (bomb.strikes >= MAX_STRIKES) lose("Probably not that one. Boom!");
+  if (bomb.strikes >= MAX_STRIKES) lose("Three strikes. Probably not that one.");
   else say("Strike! Probably not that one. The timer just got faster.");
 }
 
@@ -184,36 +225,62 @@ function scheduleTick() {
 
 function tick() {
   bomb.timeLeft--;
+  bomb.tickedAt = Date.now();        // the Reactor's Ignition stage uses this
   renderTimer();
-  if (bomb.timeLeft <= 0) lose("Time's up. Boom!");
+  if (bomb.timeLeft <= 0) lose("Time's up.");
+}
+
+// ---------- Start, win and lose ----------
+let chosen = null;                                  // the difficulty the player picked
+
+function choose(key) {
+  chosen = DIFFICULTIES[key];
+  document.querySelectorAll(".diff").forEach((b) => b.classList.toggle("picked", b.dataset.d === key));
+  $("startBtn").disabled = false;
+  try { localStorage.setItem("pb-difficulty", key); } catch (e) { /* storage can be blocked: ignore it */ }
 }
 
 function start() {
+  if (!chosen) return;
+  bomb = newBomb(chosen);                           // a fresh bomb for this difficulty
+  renderInfo();
+  renderTimer();
+  renderStrikes();
+  buildSlots(chosen);
+  document.body.classList.remove("pre-start");      // reveal the bomb
+  applyRotation();
+  fitToScreen();
   bomb.running = true;
-  document.body.classList.remove("pre-start");   // reveal the bomb
   say("Defuse it!");
-  $("startBtn").style.display = "none";
   scheduleTick();
 }
 
-function endGame() {
+function endGame(won, title, reason) {              // shows the BOOM (or "defused") screen
   bomb.running = false;
   clearTimeout(tickHandle);
-  $("startBtn").textContent = "Try again";
-  $("startBtn").style.display = "inline-block";
-  $("startBtn").onclick = () => location.reload();
+  $("endScreen").className = "end " + (won ? "win" : "boom");
+  $("endTitle").textContent = title;
+  $("endReason").textContent = reason;
+  $("endScreen").hidden = false;
 }
-function win() { endGame(); say("Probably defused!"); }
-function lose(reason) { endGame(); say(reason); }
+function win() { endGame(true, "Probably defused!", "Time left: " + formatTime(bomb.timeLeft)); }
+function lose(reason) { endGame(false, "BOOM", reason); }
 
 // ---------- Setup ----------
-renderInfo();
-renderTimer();
-renderStrikes();
-buildSlots();
-applyRotation();
-fitToScreen();
 window.addEventListener("resize", fitToScreen);
+document.querySelectorAll(".diff").forEach((b) => {
+  const d = DIFFICULTIES[b.dataset.d];
+  b.querySelector("span").innerHTML = `${d.modules} modules<br>${formatTime(d.seconds).replace(/^0/, "")}`;   // the menu text comes from DIFFICULTIES
+  b.addEventListener("click", () => choose(b.dataset.d));
+});
+const missingMods = Object.keys(MODULE_TIERS).filter((n) => typeof window[n] !== "function");
+if (missingMods.length) {                            // a module file that did not load: say so, instead of quietly leaving it out
+  $("menuWarn").hidden = false;
+  $("menuWarn").textContent = "Missing module files: " + missingMods.map((n) => n.replace(/^mount/, "")).join(", ") + ". Check your js/modules folder.";
+}
+if (typeof BUILD !== "undefined") $("build").textContent = BUILD;
 $("startBtn").onclick = start;
 $("frontBtn").onclick = () => snapTo(0, 0);
 $("backBtn").onclick = () => snapTo(0, 180);
+$("againBtn").onclick = () => location.reload();    // back to the difficulty menu
+try { const last = localStorage.getItem("pb-difficulty"); if (DIFFICULTIES[last]) choose(last); } catch (e) { /* ignore */ }
